@@ -1,0 +1,83 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header [title]="test()?.nombre ?? 'Evaluar'" [backLink]="'/pacientes/' + pacienteId" />
+
+  <main class="mx-auto max-w-4xl px-8 py-10 space-y-6">
+    @if (error()) {
+      <p class="text-sm text-red-600">{{ error() }}</p>
+    }
+
+    @if (cargando()) {
+      <p class="text-sm text-clinico-texto/60">Cargando...</p>
+    }
+
+    @if (resultado(); as r) {
+      <section class="card border-l-4 border-l-clinico-primario p-8 text-center">
+        <span
+          class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-clinico-primario/15 text-clinico-primario"
+        >
+          <app-icon name="check" class="w-7 h-7" />
+        </span>
+        <h2 class="font-display font-semibold text-clinico-texto text-2xl mb-1">Evaluación registrada</h2>
+        <p class="text-sm text-clinico-texto/60 mb-6">{{ test()?.nombre }}</p>
+
+        <div class="flex items-center justify-center gap-10">
+          <div>
+            <p class="text-xs text-clinico-texto/50 uppercase tracking-wide">Puntaje total</p>
+            <p class="font-display font-semibold text-clinico-texto text-3xl mt-1">{{ r.puntaje_total }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-clinico-texto/50 uppercase tracking-wide">Posible diagnóstico</p>
+            <p class="font-display font-semibold text-clinico-secundario text-3xl mt-1">
+              {{ r.diagnostico ?? "Sin rango definido" }}
+            </p>
+          </div>
+        </div>
+
+        <a [routerLink]="['/pacientes', pacienteId]" class="btn-primary inline-flex mt-8">
+          Volver al paciente
+        </a>
+      </section>
+    } @else if (!cargando() && test(); as t) {
+      <section class="card border-l-4 border-l-clinico-secundario p-8">
+        <h2 class="font-display font-semibold text-clinico-texto text-xl mb-1">{{ t.nombre }}</h2>
+        @if (t.descripcion) {
+          <p class="text-sm text-clinico-texto/60 mb-6">{{ t.descripcion }}</p>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+          <div formArrayName="respuestas" class="space-y-5">
+            @for (pregunta of t.preguntas; track pregunta.id; let i = $index) {
+              <div class="border border-clinico-borde rounded-xl p-4">
+                <p class="text-sm font-medium text-clinico-texto mb-3">{{ i + 1 }}. {{ pregunta.texto }}</p>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  @for (opcion of opciones; track opcion.valor) {
+                    <label
+                      class="flex items-center justify-center gap-1.5 rounded-lg border border-clinico-borde px-2 py-2 text-xs
+                        font-medium text-clinico-texto/70 cursor-pointer transition-colors duration-150
+                        has-[:checked]:bg-clinico-secundario has-[:checked]:text-white has-[:checked]:border-clinico-secundario"
+                    >
+                      <input
+                        type="radio"
+                        class="sr-only"
+                        [formControlName]="i.toString()"
+                        [value]="opcion.valor"
+                      />
+                      {{ opcion.etiqueta }}
+                    </label>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="flex gap-3">
+            <button type="submit" [disabled]="form.invalid || guardando()" class="btn-primary">
+              {{ guardando() ? "Registrando..." : "Finalizar evaluación" }}
+            </button>
+            <a [routerLink]="['/pacientes', pacienteId]" class="btn-secondary">Cancelar</a>
+          </div>
+        </form>
+      </section>
+    }
+  </main>
+</div>

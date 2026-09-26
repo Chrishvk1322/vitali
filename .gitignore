@@ -1,0 +1,75 @@
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Angular (todo lo que hay en .angular es caché de compilación)
+/.angular/
+
+# Node
+/node_modules
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Tauri / Rust
+# src-tauri/.gitignore ya lo cubre; se repite aquí porque target/ pesa varios GB
+# y subirlo por error sería costoso de deshacer.
+/src-tauri/target/
+/src-tauri/gen/schemas/
+
+# Secretos y configuración local
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+client_secret*.json
+
+# Datos de pacientes: la base de datos y los archivos (adjuntos, grabaciones) viven
+# en %APPDATA%\com.vitali.clinica y NUNCA deben entrar al repositorio.
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+/adjuntos/
+/grabaciones/
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Claude Code (configuración local de cada máquina)
+.claude/settings.local.json
+
+# Miscellaneous
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini

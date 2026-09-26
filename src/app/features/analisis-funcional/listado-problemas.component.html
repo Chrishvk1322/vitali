@@ -1,0 +1,164 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header title="Sesión de consulta" [backLink]="'/pacientes/' + pacienteId" />
+
+  <main class="mx-auto max-w-3xl px-8 py-10 space-y-6">
+    @if (error()) {
+      <p class="text-sm text-red-600">{{ error() }}</p>
+    }
+
+    <section class="card border-l-4 border-l-clinico-secundario p-8">
+      <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center gap-3">
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-clinico-secundario text-white">
+            <app-icon name="tests" class="w-4.5 h-4.5" />
+          </span>
+          <h2 class="font-semibold text-clinico-texto text-lg">Análisis funcional</h2>
+        </div>
+        <button
+          type="button"
+          (click)="abrirModalNuevoProblema()"
+          class="btn-secondary px-3 py-1.5 text-sm inline-flex items-center gap-1.5"
+        >
+          <app-icon name="plus" class="w-4 h-4" />
+          Agregar problema
+        </button>
+      </div>
+
+      @if (cargando()) {
+        <p class="text-sm text-clinico-texto/60">Cargando...</p>
+      } @else if (problemas().length === 0) {
+        <p class="text-sm text-clinico-texto/60">Aún no hay problemas registrados</p>
+      }
+
+      <div class="space-y-3">
+        @for (problema of problemas(); track problema.id) {
+          <div
+            class="group card flex items-center gap-4 p-5 transition-all duration-150
+              hover:shadow-md hover:-translate-y-0.5 hover:border-clinico-secundario/40"
+          >
+            <a
+              [routerLink]="['/pacientes', pacienteId, 'analisis-funcional', problema.id]"
+              class="flex items-center gap-4 flex-1 min-w-0"
+            >
+              <span
+                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-secundario
+                  text-white font-display font-semibold"
+              >
+                {{ problema.nombre.charAt(0) }}
+              </span>
+              <p class="font-display font-semibold text-clinico-texto text-lg truncate">{{ problema.nombre }}</p>
+            </a>
+            <button
+              type="button"
+              (click)="abrirModalEliminar(problema.id)"
+              class="text-clinico-texto/40 hover:text-red-600 p-1 shrink-0"
+              title="Eliminar problema"
+            >
+              <app-icon name="trash" class="w-4 h-4" />
+            </button>
+          </div>
+        }
+      </div>
+    </section>
+
+    <a
+      [routerLink]="['/pacientes', pacienteId, 'entrevista']"
+      class="group card flex items-center gap-4 p-6 border-l-4 border-l-clinico-secundario transition-all duration-150
+        hover:shadow-md hover:-translate-y-0.5 hover:border-clinico-secundario/60"
+    >
+      <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-secundario text-white">
+        <app-icon name="edit" class="w-5 h-5" />
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="font-display font-semibold text-clinico-texto text-lg">Entrevista</p>
+        <p class="text-sm text-clinico-texto/60 mt-0.5">Pautas para la entrevista conductual</p>
+      </div>
+      <app-icon name="arrow-left" class="w-4 h-4 text-clinico-texto/30 rotate-180 shrink-0" />
+    </a>
+
+    <a
+      [routerLink]="['/pacientes', pacienteId, 'propuesta']"
+      class="group card flex items-center gap-4 p-6 border-l-4 border-l-clinico-primario transition-all duration-150
+        hover:shadow-md hover:-translate-y-0.5 hover:border-clinico-primario/60"
+    >
+      <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-primario/10 text-clinico-primario">
+        <app-icon name="plantillas" class="w-5 h-5" />
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="font-display font-semibold text-clinico-texto text-lg">Propuesta de intervención terapéutica</p>
+        <p class="text-sm text-clinico-texto/60 mt-0.5">Objetivos, modalidad y plan de trabajo terapéutico</p>
+      </div>
+      <app-icon name="arrow-left" class="w-4 h-4 text-clinico-texto/30 rotate-180 shrink-0" />
+    </a>
+  </main>
+
+  @if (modalNuevoProblemaAbierto()) {
+    <div class="fixed inset-0 bg-black/30 flex items-center justify-center px-4 animate-fade-in">
+      <div class="card p-6 w-full max-w-md animate-scale-in">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-clinico-texto">Agregar problema</h3>
+          <button type="button" (click)="cerrarModalNuevoProblema()" class="text-clinico-texto/40 hover:text-clinico-texto">
+            <app-icon name="close" class="w-5 h-5" />
+          </button>
+        </div>
+
+        <label class="field-label">
+          Nombre del problema
+          <input
+            type="text"
+            [ngModel]="nuevoNombre()"
+            (ngModelChange)="nuevoNombre.set($event)"
+            placeholder="Ej: Ansiedad social"
+            class="field"
+          />
+        </label>
+
+        <div class="flex gap-3 justify-end pt-4">
+          <button type="button" (click)="cerrarModalNuevoProblema()" class="btn-secondary">Cancelar</button>
+          <button
+            type="button"
+            (click)="guardarNuevoProblema()"
+            [disabled]="!nuevoNombre().trim() || guardando()"
+            class="btn-primary"
+          >
+            {{ guardando() ? "Guardando..." : "Guardar" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (modalEliminarAbierto()) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center px-4 animate-fade-in">
+      <div class="card p-6 w-full max-w-md animate-scale-in border-t-4 border-t-red-500">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <app-icon name="alert-triangle" class="w-5 h-5" />
+          </span>
+          <div>
+            <h3 class="font-semibold text-clinico-texto">Eliminar problema</h3>
+            <p class="text-sm text-clinico-texto/60 mt-1">
+              Esta acción es irreversible. Se eliminará permanentemente el análisis funcional de este problema.
+            </p>
+          </div>
+        </div>
+
+        @if (errorEliminar()) {
+          <p class="text-sm text-red-600 mb-3">{{ errorEliminar() }}</p>
+        }
+
+        <div class="flex gap-3 justify-end pt-2">
+          <button type="button" (click)="cerrarModalEliminar()" class="btn-secondary">Cancelar</button>
+          <button
+            type="button"
+            (click)="confirmarEliminar()"
+            [disabled]="eliminando()"
+            class="btn-danger"
+          >
+            {{ eliminando() ? "Eliminando..." : "Sí, eliminar" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

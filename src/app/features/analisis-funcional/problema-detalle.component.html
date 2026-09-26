@@ -1,0 +1,203 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header title="Análisis funcional" [backLink]="'/pacientes/' + pacienteId + '/analisis-funcional'">
+    <div actions>
+      <button
+        type="button"
+        (click)="abrirModalEliminar()"
+        class="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50
+          pl-2.5 pr-3.5 py-1.5 text-sm font-medium text-red-600
+          transition-colors duration-150 hover:bg-red-100 hover:border-red-300"
+      >
+        <app-icon name="trash" class="w-4 h-4" />
+        Eliminar
+      </button>
+    </div>
+  </app-page-header>
+
+  <main class="mx-auto w-[80%] px-8 py-10">
+    @if (cargando()) {
+      <p class="text-sm text-clinico-texto/60">Cargando...</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="space-y-6" [class.hidden]="cargando()">
+      <div>
+        <span class="text-xs text-clinico-texto/50">Problema</span>
+        <div class="flex items-center gap-2">
+          <input
+            formControlName="nombre"
+            placeholder="Nombre del problema"
+            [readOnly]="!editandoNombre()"
+            [class.cursor-default]="!editandoNombre()"
+            class="w-full border-0 border-b-2 bg-transparent px-0 py-1
+              font-display font-semibold text-clinico-texto text-2xl outline-none
+              transition-colors duration-150 focus:border-clinico-secundario"
+            [class.border-clinico-borde]="editandoNombre()"
+            [class.border-transparent]="!editandoNombre()"
+          />
+          @if (!editandoNombre()) {
+            <button
+              type="button"
+              (click)="habilitarEdicionNombre()"
+              class="text-clinico-texto/40 hover:text-clinico-secundario p-1 shrink-0"
+              title="Editar nombre del problema"
+            >
+              <app-icon name="edit" class="w-4 h-4" />
+            </button>
+          }
+        </div>
+      </div>
+
+      <section class="card border-l-4 border-l-clinico-secundario p-6">
+        <h2 class="font-semibold text-clinico-texto mb-4">Análisis funcional</h2>
+
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[900px] border-collapse text-base">
+            <tbody>
+              <tr>
+                <th class="border border-clinico-borde bg-clinico-fondo px-4 py-3 text-left text-clinico-texto font-semibold">Antecedentes</th>
+                <th class="border border-clinico-borde bg-clinico-fondo px-4 py-3 text-left text-clinico-texto font-semibold">Conducta problema</th>
+                <th class="border border-clinico-borde bg-clinico-fondo px-4 py-3 text-left text-clinico-texto font-semibold">Consecuencia</th>
+              </tr>
+
+              <tr>
+                <td class="border border-clinico-borde px-4 py-2 font-medium text-clinico-texto/70 text-sm uppercase">Situacionales</td>
+                <td class="border border-clinico-borde px-4 py-2 font-medium text-clinico-texto/70 text-sm uppercase">Fisiológicos</td>
+                <td class="border border-clinico-borde px-4 py-2 font-medium text-clinico-texto/70 text-sm uppercase">Situacionales</td>
+              </tr>
+              <tr>
+                <td class="border border-clinico-borde p-2 align-top">
+                  <textarea formControlName="ant_situacionales" rows="5" class="field w-full text-base"></textarea>
+                </td>
+                <td class="border border-clinico-borde p-2 align-top">
+                  <textarea formControlName="conducta_fisiologicos" rows="5" class="field w-full text-base"></textarea>
+                </td>
+                <td class="border border-clinico-borde p-2 align-top">
+                  <textarea formControlName="consec_situacionales" rows="5" class="field w-full text-base"></textarea>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="border border-clinico-borde px-4 py-2 font-medium text-clinico-texto/70 text-sm uppercase">Fisiológicos</td>
+                <td class="border border-clinico-borde px-4 py-2 font-medium text-clinico-texto/70 text-sm uppercase">Cognitivos</td>
+                <td class="border border-clinico-borde px-4 py-2 font-medium text-clinico-texto/70 text-sm uppercase">Fisiológicos</td>
+              </tr>
+              <tr>
+                <td class="border border-clinico-borde p-2 align-top">
+                  <textarea formControlName="ant_fisiologicos" rows="5" class="field w-full text-base"></textarea>
+                </td>
+                <td class="border border-clinico-borde p-2 align-top">
+                  <textarea formControlName="conducta_cognitivos" rows="5" class="field w-full text-base"></textarea>
+                </td>
+                <td class="border border-clinico-borde p-2 align-top">
+                  <textarea formControlName="consec_fisiologicos" rows="5" class="field w-full text-base"></textarea>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="border border-clinico-borde px-4 py-2 font-medium text-clinico-texto/70 text-sm uppercase">Cognitivos</td>
+                <td class="border border-clinico-borde px-4 py-2 font-medium text-clinico-texto/70 text-sm uppercase">Motoras</td>
+                <td class="border border-clinico-borde px-4 py-2 font-medium text-clinico-texto/70 text-sm uppercase">Cognitivos</td>
+              </tr>
+              <tr>
+                <td class="border border-clinico-borde p-2 align-top">
+                  <textarea formControlName="ant_cognitivos" rows="5" class="field w-full text-base"></textarea>
+                </td>
+                <td class="border border-clinico-borde p-2 align-top">
+                  <textarea formControlName="conducta_motoras" rows="5" class="field w-full text-base"></textarea>
+                </td>
+                <td class="border border-clinico-borde p-2 align-top">
+                  <textarea formControlName="consec_cognitivos" rows="5" class="field w-full text-base"></textarea>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="border border-clinico-borde"></td>
+                <td class="border border-clinico-borde px-4 py-2 font-medium text-clinico-texto/70 text-sm uppercase">Medición</td>
+                <td class="border border-clinico-borde"></td>
+              </tr>
+              <tr>
+                <td class="border border-clinico-borde"></td>
+                <td class="border border-clinico-borde p-2 align-top">
+                  <textarea formControlName="conducta_medicion" rows="5" class="field w-full text-base"></textarea>
+                </td>
+                <td class="border border-clinico-borde"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card border-l-4 border-l-clinico-primario p-6">
+        <h2 class="font-semibold text-clinico-texto mb-4">Diagnóstico funcional</h2>
+
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[700px] border-collapse text-base">
+            <tbody>
+              <tr>
+                <th class="border border-clinico-borde bg-clinico-fondo px-4 py-3 text-left text-clinico-texto font-semibold">Exceso</th>
+                <th class="border border-clinico-borde bg-clinico-fondo px-4 py-3 text-left text-clinico-texto font-semibold">Debilitamiento</th>
+                <th class="border border-clinico-borde bg-clinico-fondo px-4 py-3 text-left text-clinico-texto font-semibold">Déficit</th>
+              </tr>
+              <tr>
+                <td class="border border-clinico-borde p-2 align-top">
+                  <textarea formControlName="diag_exceso" rows="6" class="field w-full text-base"></textarea>
+                </td>
+                <td class="border border-clinico-borde p-2 align-top">
+                  <textarea formControlName="diag_debilitamiento" rows="6" class="field w-full text-base"></textarea>
+                </td>
+                <td class="border border-clinico-borde p-2 align-top">
+                  <textarea formControlName="diag_deficit" rows="6" class="field w-full text-base"></textarea>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      @if (error()) {
+        <p class="text-sm text-red-600">{{ error() }}</p>
+      }
+
+      <div class="flex gap-3">
+        <button type="submit" [disabled]="form.invalid || guardando()" class="btn-primary">
+          {{ guardando() ? "Guardando..." : "Guardar Cambios" }}
+        </button>
+        <a [routerLink]="['/pacientes', pacienteId, 'analisis-funcional']" class="btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  </main>
+
+  @if (modalEliminarAbierto()) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center px-4 animate-fade-in">
+      <div class="card p-6 w-full max-w-md animate-scale-in border-t-4 border-t-red-500">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <app-icon name="alert-triangle" class="w-5 h-5" />
+          </span>
+          <div>
+            <h3 class="font-semibold text-clinico-texto">Eliminar problema</h3>
+            <p class="text-sm text-clinico-texto/60 mt-1">
+              Esta acción es irreversible. Se eliminará permanentemente el análisis funcional de este problema.
+            </p>
+          </div>
+        </div>
+
+        @if (errorEliminar()) {
+          <p class="text-sm text-red-600 mb-3">{{ errorEliminar() }}</p>
+        }
+
+        <div class="flex gap-3 justify-end pt-2">
+          <button type="button" (click)="cerrarModalEliminar()" class="btn-secondary">Cancelar</button>
+          <button
+            type="button"
+            (click)="confirmarEliminar()"
+            [disabled]="eliminando()"
+            class="btn-danger"
+          >
+            {{ eliminando() ? "Eliminando..." : "Sí, eliminar" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

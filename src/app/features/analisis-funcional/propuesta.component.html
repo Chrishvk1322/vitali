@@ -1,0 +1,159 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header title="Propuesta de intervención terapéutica" [backLink]="'/pacientes/' + pacienteId + '/analisis-funcional'" />
+
+  <main class="mx-auto w-[80%] px-8 py-10">
+    @if (cargando()) {
+      <p class="text-sm text-clinico-texto/60">Cargando...</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="space-y-6" [class.hidden]="cargando()">
+      <section class="card border-l-4 border-l-clinico-secundario p-6">
+        <label class="field-label">
+          Objetivo general
+          <textarea formControlName="objetivo_general" rows="3" class="field w-full"></textarea>
+        </label>
+      </section>
+
+      <section class="card border-l-4 border-l-clinico-secundario p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-clinico-texto">Objetivos específicos</h2>
+          <button type="button" (click)="agregarObjetivo()" class="btn-secondary px-3 py-1.5 text-sm inline-flex items-center gap-1.5">
+            <app-icon name="plus" class="w-4 h-4" />
+            Agregar objetivo
+          </button>
+        </div>
+
+        @if (objetivosEspecificos.length === 0) {
+          <p class="text-sm text-clinico-texto/60">Aún no se han agregado objetivos específicos.</p>
+        }
+
+        <div class="space-y-3">
+          @for (objetivo of objetivosEspecificos.controls; track objetivo; let i = $index) {
+            <div class="flex items-start gap-2">
+              <span class="text-sm text-clinico-texto/40 mt-2.5 w-5 shrink-0">{{ i + 1 }}.</span>
+              <input [formControl]="objetivo" placeholder="Objetivo específico" class="field flex-1" />
+              <button
+                type="button"
+                (click)="quitarObjetivo(i)"
+                class="text-clinico-texto/40 hover:text-red-600 p-2"
+                title="Quitar objetivo"
+              >
+                <app-icon name="trash" class="w-4 h-4" />
+              </button>
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="card border-l-4 border-l-clinico-primario p-6">
+        <h2 class="font-semibold text-clinico-texto mb-4">Modalidad y condiciones de trabajo</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <label class="field-label">
+            Modalidad
+            <input formControlName="modalidad" class="field" />
+          </label>
+          <label class="field-label">
+            Frecuencia
+            <input formControlName="frecuencia" class="field" />
+          </label>
+          <label class="field-label">
+            Duración por sesión (minutos)
+            <input formControlName="duracion_sesion_minutos" class="field" />
+          </label>
+          <label class="field-label">
+            Duración estimada del tratamiento
+            <input formControlName="duracion_estimada_tratamiento" class="field" />
+          </label>
+        </div>
+      </section>
+
+      <section class="card border-l-4 border-l-clinico-secundario p-6">
+        <h2 class="font-semibold text-clinico-texto mb-4">Plan de trabajo terapéutico</h2>
+
+        @if (fases.length === 0) {
+          <p class="text-sm text-clinico-texto/60 mb-4">Aún no se han agregado fases.</p>
+        }
+
+        <div class="space-y-5">
+          @for (fase of fases.controls; track fase; let indiceFase = $index) {
+            <div class="border border-clinico-borde rounded-xl p-4">
+              <div class="flex items-start gap-2 mb-3">
+                <span class="text-sm font-semibold text-clinico-texto mt-2.5 shrink-0">Fase {{ indiceFase + 1 }}:</span>
+                <input
+                  [formControl]="fase.controls.nombre"
+                  placeholder="Nombre o descripción de la fase"
+                  class="field flex-1"
+                />
+                <button
+                  type="button"
+                  (click)="quitarFase(indiceFase)"
+                  class="text-clinico-texto/40 hover:text-red-600 p-2"
+                  title="Quitar fase"
+                >
+                  <app-icon name="trash" class="w-4 h-4" />
+                </button>
+              </div>
+
+              <div class="space-y-3 pl-2">
+                @for (sesion of sesionesDe(fase).controls; track sesion; let indiceSesion = $index) {
+                  <div class="grid grid-cols-1 sm:grid-cols-[auto_1fr_1.5fr_auto] gap-2 items-start">
+                    <span class="text-sm font-medium text-clinico-texto/70 mt-2.5 whitespace-nowrap">
+                      Sesión {{ numeroSesion(indiceFase, indiceSesion) }}:
+                    </span>
+                    <input
+                      [formControl]="sesion.controls.descripcion"
+                      placeholder="Descripción de la sesión"
+                      class="field"
+                    />
+                    <textarea
+                      [formControl]="sesion.controls.contenido"
+                      rows="2"
+                      placeholder="Contenido"
+                      class="field w-full"
+                    ></textarea>
+                    <button
+                      type="button"
+                      (click)="quitarSesion(fase, indiceSesion)"
+                      class="text-clinico-texto/40 hover:text-red-600 p-2 justify-self-start sm:justify-self-auto"
+                      title="Quitar sesión"
+                    >
+                      <app-icon name="trash" class="w-4 h-4" />
+                    </button>
+                  </div>
+                }
+              </div>
+
+              <button
+                type="button"
+                (click)="agregarSesion(fase)"
+                class="btn-secondary px-3 py-1.5 text-sm inline-flex items-center gap-1.5 mt-3 ml-2"
+              >
+                <app-icon name="plus" class="w-4 h-4" />
+                Agregar sesión
+              </button>
+            </div>
+          }
+        </div>
+
+        <button
+          type="button"
+          (click)="agregarFase()"
+          class="btn-secondary px-3 py-1.5 text-sm inline-flex items-center gap-1.5 mt-5"
+        >
+          <app-icon name="plus" class="w-4 h-4" />
+          Agregar fase
+        </button>
+      </section>
+
+      @if (error()) {
+        <p class="text-sm text-red-600">{{ error() }}</p>
+      }
+
+      <div class="flex gap-3">
+        <button type="submit" [disabled]="guardando()" class="btn-primary">
+          {{ guardando() ? "Guardando..." : "Guardar Cambios" }}
+        </button>
+      </div>
+    </form>
+  </main>
+</div>

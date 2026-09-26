@@ -1,0 +1,99 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header [title]="titulo()" backLink="/tests" />
+
+  <main class="mx-auto max-w-4xl px-8 py-10">
+    @if (cargando()) {
+      <p class="text-sm text-clinico-texto/60">Cargando...</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6" [class.hidden]="cargando()">
+      <section class="card border-l-4 border-l-clinico-secundario p-6">
+        <h2 class="font-semibold text-clinico-texto mb-4">Datos del test</h2>
+        <div class="grid grid-cols-1 gap-5">
+          <label class="field-label">
+            Nombre *
+            <input formControlName="nombre" class="field" />
+          </label>
+          <label class="field-label">
+            Descripción
+            <textarea formControlName="descripcion" rows="2" class="field"></textarea>
+          </label>
+        </div>
+      </section>
+
+      <section class="card border-l-4 border-l-clinico-primario p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-clinico-texto">Preguntas</h2>
+          <button type="button" (click)="agregarPregunta()" class="btn-secondary px-3 py-1.5 text-sm inline-flex items-center gap-1.5">
+            <app-icon name="plus" class="w-4 h-4" />
+            Agregar pregunta
+          </button>
+        </div>
+        <p class="text-xs text-clinico-texto/50 -mt-2 mb-4">
+          Cada pregunta se responderá con la escala: nunca, rara vez, a veces, frecuentemente, siempre (valores de 0 a 4).
+        </p>
+
+        <div formArrayName="preguntas" class="space-y-3">
+          @for (pregunta of preguntas.controls; track pregunta; let i = $index) {
+            <div [formGroupName]="i" class="flex items-start gap-2">
+              <span class="text-sm text-clinico-texto/40 mt-2.5 w-5 shrink-0">{{ i + 1 }}.</span>
+              <input formControlName="texto" placeholder="Texto de la pregunta" class="field flex-1" />
+              <button
+                type="button"
+                (click)="quitarPregunta(i)"
+                [disabled]="preguntas.length === 1"
+                class="text-clinico-texto/40 hover:text-red-600 p-2 disabled:opacity-30 disabled:hover:text-clinico-texto/40"
+                title="Quitar pregunta"
+              >
+                <app-icon name="trash" class="w-4 h-4" />
+              </button>
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="card border-l-4 border-l-clinico-secundario p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-clinico-texto">Rangos de diagnóstico</h2>
+          <button type="button" (click)="agregarRango()" class="btn-secondary px-3 py-1.5 text-sm inline-flex items-center gap-1.5">
+            <app-icon name="plus" class="w-4 h-4" />
+            Agregar rango
+          </button>
+        </div>
+        <p class="text-xs text-clinico-texto/50 -mt-2 mb-4">
+          Al finalizar una evaluación se suman los valores de todas las respuestas y se busca en qué rango cae ese puntaje.
+        </p>
+
+        <div formArrayName="rangos" class="space-y-3">
+          @for (rango of rangos.controls; track rango; let i = $index) {
+            <div [formGroupName]="i" class="grid grid-cols-[1fr_1fr_2fr_auto] gap-2 items-start">
+              <input type="number" formControlName="puntaje_min" placeholder="Mín." class="field" />
+              <input type="number" formControlName="puntaje_max" placeholder="Máx." class="field" />
+              <input formControlName="etiqueta" placeholder="Etiqueta / diagnóstico" class="field" />
+              <button
+                type="button"
+                (click)="quitarRango(i)"
+                [disabled]="rangos.length === 1"
+                class="text-clinico-texto/40 hover:text-red-600 p-2 disabled:opacity-30 disabled:hover:text-clinico-texto/40"
+                title="Quitar rango"
+              >
+                <app-icon name="trash" class="w-4 h-4" />
+              </button>
+            </div>
+          }
+        </div>
+      </section>
+
+      @if (error()) {
+        <p class="text-sm text-red-600">{{ error() }}</p>
+      }
+
+      <div class="flex gap-3">
+        <button type="submit" [disabled]="form.invalid || guardando()" class="btn-primary">
+          {{ guardando() ? "Guardando..." : modoEdicion ? "Guardar Cambios" : "Guardar Test" }}
+        </button>
+        <a routerLink="/tests" class="btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  </main>
+</div>

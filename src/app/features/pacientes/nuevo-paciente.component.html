@@ -1,0 +1,134 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header [title]="titulo()" [backLink]="backLink()" />
+
+  <main class="mx-auto max-w-4xl px-8 py-10">
+    @if (cargando()) {
+      <p class="text-sm text-clinico-texto/60">Cargando...</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6" [class.hidden]="cargando()">
+      <section class="card border-l-4 border-l-clinico-secundario p-6">
+        <h2 class="font-semibold text-clinico-texto mb-4">Datos personales</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <label class="field-label sm:col-span-2">
+            Apellidos y nombres *
+            <input formControlName="apellidos_nombres" class="field" />
+          </label>
+
+          <label class="field-label">
+            Edad
+            <input type="number" formControlName="edad" class="field" />
+          </label>
+
+          <label class="field-label">
+            Sexo
+            <select formControlName="sexo" class="field">
+              <option [ngValue]="null"></option>
+              <option value="Femenino">Femenino</option>
+              <option value="Masculino">Masculino</option>
+            </select>
+          </label>
+
+          <label class="field-label">
+            Fecha de nacimiento *
+            <input type="date" formControlName="fecha_nacimiento" class="field" />
+          </label>
+
+          <label class="field-label">
+            Lugar de nacimiento
+            <input formControlName="lugar_nacimiento" class="field" />
+          </label>
+
+          <label class="field-label">
+            Estado civil
+            <select formControlName="estado_civil" class="field">
+              <option [ngValue]="null"></option>
+              @for (opcion of estadosCiviles; track opcion) {
+                <option [value]="opcion">{{ opcion }}</option>
+              }
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="card border-l-4 border-l-clinico-primario p-6">
+        <h2 class="font-semibold text-clinico-texto mb-4">Datos socioeconómicos y de contacto</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <label class="field-label">
+            Grado de instrucción
+            <select formControlName="grado_instruccion" class="field">
+              <option [ngValue]="null"></option>
+              @for (opcion of gradosInstruccion; track opcion) {
+                <option [value]="opcion">{{ opcion }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="field-label">
+            Ocupación
+            <input formControlName="ocupacion" class="field" />
+          </label>
+
+          <label class="field-label sm:col-span-2">
+            Domicilio
+            <input formControlName="domicilio" class="field" />
+          </label>
+
+          <label class="field-label">
+            Teléfono
+            <input formControlName="telefono" class="field" />
+          </label>
+
+          <label class="field-label">
+            Email
+            <input type="email" formControlName="email" class="field" />
+          </label>
+        </div>
+      </section>
+
+      <section class="card border-l-4 border-l-clinico-secundario p-6">
+        <h2 class="font-semibold text-clinico-texto mb-4">Datos familiares</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <label class="field-label">
+            Número de hijos (vacío = No tiene)
+            <input type="number" formControlName="num_hijos" class="field" />
+          </label>
+
+          <label class="field-label">
+            Número de hermanos (vacío = No tiene)
+            <input type="number" formControlName="num_hermanos" class="field" />
+          </label>
+
+          <label class="field-label">
+            Vive con
+            <input formControlName="vive_con" class="field" />
+          </label>
+
+          <label class="field-label">
+            Nombre del acompañante
+            <input formControlName="nombre_acompanante" class="field" />
+          </label>
+        </div>
+      </section>
+
+      <section class="card border-l-4 border-l-clinico-primario p-6">
+        <h2 class="font-semibold text-clinico-texto mb-4">Consulta</h2>
+        <label class="field-label max-w-xs">
+          Fecha de consulta *
+          <input type="date" formControlName="fecha_consulta" class="field" />
+        </label>
+      </section>
+
+      @if (error()) {
+        <p class="text-sm text-red-600">{{ error() }}</p>
+      }
+
+      <div class="flex gap-3">
+        <button type="submit" [disabled]="form.invalid || guardando()" class="btn-primary">
+          {{ guardando() ? "Guardando..." : modoEdicion ? "Guardar Cambios" : "Guardar Paciente" }}
+        </button>
+        <a [routerLink]="cancelarLink()" class="btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  </main>
+</div>

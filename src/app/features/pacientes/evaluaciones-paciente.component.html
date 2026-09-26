@@ -1,0 +1,92 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header title="Evaluaciones" [backLink]="'/pacientes/' + pacienteId">
+    <div actions>
+      <a
+        [routerLink]="['/pacientes', pacienteId, 'evaluar']"
+        class="inline-flex items-center gap-1.5 rounded-full bg-clinico-fondo
+          pl-2.5 pr-3.5 py-1.5 text-sm font-medium text-clinico-secundario-oscuro
+          transition-colors duration-150 hover:bg-white"
+      >
+        <app-icon name="tests" class="w-4 h-4" />
+        Evaluar
+      </a>
+    </div>
+  </app-page-header>
+
+  <main class="mx-auto max-w-3xl px-8 py-10">
+    @if (error()) {
+      <p class="text-sm text-red-600 mb-4">{{ error() }}</p>
+    }
+
+    @if (cargando()) {
+      <p class="text-sm text-clinico-texto/60">Cargando...</p>
+    } @else if (resultados().length === 0) {
+      <p class="text-sm text-clinico-texto/60">No tiene evaluaciones registradas.</p>
+    }
+
+    <div class="space-y-3">
+      @for (resultado of resultados(); track resultado.id) {
+        <div class="card p-5">
+          <div class="flex justify-between items-start gap-2">
+            <div>
+              <p class="text-sm font-medium text-clinico-texto">{{ resultado.test_nombre }}</p>
+              <p class="text-xs text-clinico-texto/50 mt-0.5">
+                {{ resultado.fecha_hora.slice(0, 10) }} · {{ resultado.fecha_hora.slice(11, 16) }}
+              </p>
+            </div>
+            <button
+              type="button"
+              (click)="abrirModalEliminarResultado(resultado.id)"
+              class="text-clinico-texto/40 hover:text-red-600 p-1 shrink-0"
+              title="Eliminar evaluación"
+            >
+              <app-icon name="trash" class="w-4 h-4" />
+            </button>
+          </div>
+          <div class="flex flex-wrap items-center gap-x-6 gap-y-1 mt-2 text-sm">
+            <span class="text-clinico-texto">
+              <span class="text-clinico-texto/50">Puntaje:</span> {{ resultado.puntaje_total }}
+            </span>
+            <span class="text-clinico-secundario font-medium">
+              {{ resultado.diagnostico ?? "Sin rango definido" }}
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  </main>
+
+  @if (modalEliminarResultadoAbierto()) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center px-4 animate-fade-in">
+      <div class="card p-6 w-full max-w-md animate-scale-in border-t-4 border-t-red-500">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <app-icon name="alert-triangle" class="w-5 h-5" />
+          </span>
+          <div>
+            <h3 class="font-semibold text-clinico-texto">Eliminar evaluación</h3>
+            <p class="text-sm text-clinico-texto/60 mt-1">
+              Esta acción es irreversible. Se eliminará permanentemente el resultado de esta evaluación.
+            </p>
+          </div>
+        </div>
+
+        @if (errorEliminarResultado()) {
+          <p class="text-sm text-red-600 mb-3">{{ errorEliminarResultado() }}</p>
+        }
+
+        <div class="flex gap-3 justify-end pt-2">
+          <button type="button" (click)="cerrarModalEliminarResultado()" class="btn-secondary">Cancelar</button>
+          <button
+            type="button"
+            (click)="confirmarEliminarResultado()"
+            [disabled]="eliminandoResultado()"
+            class="btn-danger"
+          >
+            {{ eliminandoResultado() ? "Eliminando..." : "Sí, eliminar" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

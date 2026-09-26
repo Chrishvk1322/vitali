@@ -1,0 +1,159 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header title="Recursos" backLink="/hub">
+    <div actions>
+      <button
+        type="button"
+        (click)="agregarRecurso()"
+        [disabled]="subiendo()"
+        class="inline-flex items-center gap-1.5 rounded-full bg-clinico-fondo
+          pl-2.5 pr-3.5 py-1.5 text-sm font-medium text-clinico-secundario-oscuro
+          transition-colors duration-150 hover:bg-white
+          disabled:opacity-50"
+      >
+        <app-icon name="plus" class="w-4 h-4" />
+        {{ subiendo() ? "Subiendo..." : "Agregar recurso" }}
+      </button>
+    </div>
+  </app-page-header>
+
+  <main class="mx-auto max-w-4xl px-8 py-10">
+    <div class="relative mb-6">
+      <app-icon
+        name="search"
+        class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-clinico-texto/40"
+      />
+      <input
+        type="text"
+        placeholder="Buscar recurso por nombre..."
+        [ngModel]="busqueda()"
+        (ngModelChange)="onBusquedaChange($event)"
+        class="field w-full pl-10"
+      />
+    </div>
+
+    @if (error()) {
+      <p class="text-sm text-red-600 mb-4">{{ error() }}</p>
+    }
+
+    @if (!cargando() && recursos().length === 0) {
+      <p class="text-sm text-clinico-texto/60">No se encontraron recursos.</p>
+    }
+
+    <div class="space-y-3">
+      @for (recurso of recursosPagina(); track recurso.id) {
+        <div
+          class="group card flex items-center gap-4 p-5 transition-all duration-150
+            hover:shadow-md hover:-translate-y-0.5 hover:border-clinico-secundario/40"
+        >
+          <button type="button" (click)="abrirVistaPrevia(recurso)" class="flex items-center gap-4 flex-1 min-w-0 text-left">
+            <span
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-secundario text-white"
+            >
+              <app-icon name="paperclip" class="w-5 h-5" />
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="font-medium text-clinico-texto truncate">{{ recurso.nombre_original }}</p>
+              <p class="text-xs text-clinico-texto/50 mt-0.5">
+                {{ recurso.creado_en.slice(0, 10) }} · {{ formatearTamano(recurso.tamano_bytes) }}
+              </p>
+            </div>
+          </button>
+          <button
+            type="button"
+            (click)="abrirModalEliminar(recurso.id)"
+            class="text-clinico-texto/40 hover:text-red-600 p-1 shrink-0"
+            title="Eliminar recurso"
+          >
+            <app-icon name="trash" class="w-4 h-4" />
+          </button>
+        </div>
+      }
+    </div>
+
+    @if (totalPaginas() > 1) {
+      <div class="flex items-center justify-center gap-2 mt-8">
+        <button
+          type="button"
+          (click)="irAPagina(paginaActual() - 1)"
+          [disabled]="paginaActual() === 1"
+          class="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+        >
+          <app-icon name="arrow-left" class="w-4 h-4" />
+        </button>
+
+        @for (pagina of paginas(); track pagina) {
+          <button
+            type="button"
+            (click)="irAPagina(pagina)"
+            class="w-9 h-9 rounded-lg text-sm font-medium transition-colors duration-150"
+            [class.bg-clinico-secundario]="paginaActual() === pagina"
+            [class.text-white]="paginaActual() === pagina"
+            [class.text-clinico-texto]="paginaActual() !== pagina"
+            [class.hover:bg-clinico-fondo]="paginaActual() !== pagina"
+          >
+            {{ pagina }}
+          </button>
+        }
+
+        <button
+          type="button"
+          (click)="irAPagina(paginaActual() + 1)"
+          [disabled]="paginaActual() === totalPaginas()"
+          class="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+        >
+          <app-icon name="arrow-left" class="w-4 h-4 rotate-180" />
+        </button>
+      </div>
+    }
+  </main>
+
+  @if (vistaPrevia(); as vista) {
+    <div class="fixed inset-0 bg-black/60 flex items-center justify-center px-4 py-8 animate-fade-in">
+      <div class="card p-4 w-full max-w-3xl h-full max-h-[90vh] flex flex-col animate-scale-in">
+        <div class="flex items-center justify-between mb-3 shrink-0">
+          <p class="font-medium text-clinico-texto truncate pr-4">{{ vista.nombre }}</p>
+          <button type="button" (click)="cerrarVistaPrevia()" class="text-clinico-texto/40 hover:text-clinico-texto shrink-0">
+            <app-icon name="close" class="w-5 h-5" />
+          </button>
+        </div>
+        <div class="flex-1 min-h-0 overflow-auto bg-clinico-fondo rounded-lg">
+          <iframe [src]="vista.src" class="w-full h-full rounded-lg border-0" title="Vista previa del PDF"></iframe>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (modalEliminarAbierto()) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center px-4 animate-fade-in">
+      <div class="card p-6 w-full max-w-md animate-scale-in border-t-4 border-t-red-500">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <app-icon name="alert-triangle" class="w-5 h-5" />
+          </span>
+          <div>
+            <h3 class="font-semibold text-clinico-texto">Eliminar recurso</h3>
+            <p class="text-sm text-clinico-texto/60 mt-1">
+              Esta acción es irreversible. Se eliminará permanentemente el archivo.
+            </p>
+          </div>
+        </div>
+
+        @if (errorEliminar()) {
+          <p class="text-sm text-red-600 mb-3">{{ errorEliminar() }}</p>
+        }
+
+        <div class="flex gap-3 justify-end pt-2">
+          <button type="button" (click)="cerrarModalEliminar()" class="btn-secondary">Cancelar</button>
+          <button
+            type="button"
+            (click)="confirmarEliminar()"
+            [disabled]="eliminando()"
+            class="btn-danger"
+          >
+            {{ eliminando() ? "Eliminando..." : "Sí, eliminar" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,146 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header title="Citas" [backLink]="'/pacientes/' + pacienteId">
+    <div actions>
+      <button
+        type="button"
+        (click)="abrirModalCita()"
+        class="inline-flex items-center gap-1.5 rounded-full bg-clinico-fondo
+          pl-2.5 pr-3.5 py-1.5 text-sm font-medium text-clinico-secundario-oscuro
+          transition-colors duration-150 hover:bg-white"
+      >
+        <app-icon name="plus" class="w-4 h-4" />
+        Agendar Siguiente Cita
+      </button>
+    </div>
+  </app-page-header>
+
+  <main class="mx-auto max-w-3xl px-8 py-10">
+    @if (error()) {
+      <p class="text-sm text-red-600 mb-4">{{ error() }}</p>
+    }
+
+    @if (cargando()) {
+      <p class="text-sm text-clinico-texto/60">Cargando...</p>
+    } @else if (citas().length === 0) {
+      <p class="text-sm text-clinico-texto/60">No tiene citas registradas.</p>
+    }
+
+    <div class="space-y-3">
+      @for (cita of citas(); track cita.id) {
+        <div class="card p-5">
+          <div class="flex justify-between items-start gap-2">
+            <div>
+              <p class="text-sm font-medium text-clinico-texto">
+                {{ cita.fecha_hora_inicio.slice(0, 10) }} · {{ cita.fecha_hora_inicio.slice(11, 16) }}
+              </p>
+              @if (cita.notas) {
+                <p class="text-sm text-clinico-texto/60 mt-0.5">{{ cita.notas }}</p>
+              }
+            </div>
+            <span
+              class="text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap"
+              [class]="claseBadgeEstado(cita.estado)"
+            >
+              {{ cita.estado }}
+            </span>
+          </div>
+          <div class="flex gap-2 mt-3">
+            @if (cita.estado === 'Programada') {
+              <button
+                type="button"
+                (click)="cancelarCita(cita.id)"
+                class="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors duration-150 hover:bg-red-50"
+              >
+                Cancelar cita
+              </button>
+            } @else {
+              <button
+                type="button"
+                (click)="abrirModalCita(cita)"
+                class="rounded-lg border border-clinico-borde px-3 py-1.5 text-sm font-medium text-clinico-texto transition-colors duration-150 hover:bg-clinico-fondo"
+              >
+                Reprogramar
+              </button>
+              <button
+                type="button"
+                (click)="abrirModalEliminarCita(cita.id)"
+                class="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors duration-150 hover:bg-red-50"
+              >
+                Eliminar
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </main>
+
+  @if (modalCitaAbierto()) {
+    <div class="fixed inset-0 bg-black/30 flex items-center justify-center px-4 animate-fade-in">
+      <div class="card p-6 w-full max-w-md animate-scale-in">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-clinico-texto">{{ citaEditId() ? "Reprogramar Cita" : "Agendar Siguiente Cita" }}</h3>
+          <button type="button" (click)="cerrarModalCita()" class="text-clinico-texto/40 hover:text-clinico-texto">
+            <app-icon name="close" class="w-5 h-5" />
+          </button>
+        </div>
+        <form [formGroup]="formCita" (ngSubmit)="guardarCita()" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <label class="field-label">
+              Fecha *
+              <input type="date" formControlName="fecha" class="field" />
+            </label>
+            <label class="field-label">
+              Hora *
+              <input type="time" formControlName="hora" class="field" />
+            </label>
+          </div>
+          <label class="field-label">
+            Notas
+            <textarea formControlName="notas" rows="2" class="field"></textarea>
+          </label>
+          <div class="flex gap-3 justify-end pt-2">
+            <button type="button" (click)="cerrarModalCita()" class="btn-secondary">Cancelar</button>
+            <button type="submit" [disabled]="formCita.invalid || guardandoCita()" class="btn-primary">
+              {{ guardandoCita() ? "Guardando..." : citaEditId() ? "Guardar Cambios" : "Confirmar" }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (modalEliminarCitaAbierto()) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center px-4 animate-fade-in">
+      <div class="card p-6 w-full max-w-md animate-scale-in border-t-4 border-t-red-500">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <app-icon name="alert-triangle" class="w-5 h-5" />
+          </span>
+          <div>
+            <h3 class="font-semibold text-clinico-texto">Eliminar cita</h3>
+            <p class="text-sm text-clinico-texto/60 mt-1">
+              Esta acción es irreversible. Se eliminará permanentemente esta cita de la agenda.
+            </p>
+          </div>
+        </div>
+
+        @if (errorEliminarCita()) {
+          <p class="text-sm text-red-600 mb-3">{{ errorEliminarCita() }}</p>
+        }
+
+        <div class="flex gap-3 justify-end pt-2">
+          <button type="button" (click)="cerrarModalEliminarCita()" class="btn-secondary">Cancelar</button>
+          <button
+            type="button"
+            (click)="confirmarEliminarCita()"
+            [disabled]="eliminandoCita()"
+            class="btn-danger"
+          >
+            {{ eliminandoCita() ? "Eliminando..." : "Sí, eliminar" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

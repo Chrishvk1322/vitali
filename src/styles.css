@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./assets/fonts/playfair-display-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./assets/fonts/playfair-display-700.woff2") format("woff2");
+}
+
+@theme {
+  --color-clinico-primario: #a2c09a;
+  --color-clinico-secundario: #6174b6;
+  --color-clinico-secundario-oscuro: #3d4d8c;
+  --color-clinico-fondo: #f8faf9;
+  --color-clinico-texto: #2c3437;
+  --color-clinico-borde: #e2e8f0;
+  --font-display: "Playfair Display", Georgia, serif;
+
+  --animate-fade-in: fade-in 150ms ease-out;
+  --animate-scale-in: scale-in 150ms ease-out;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(4px);
+    }
+  }
+}
+
+body {
+  background-color: var(--color-clinico-fondo);
+  color: var(--color-clinico-texto);
+}
+
+::selection {
+  background-color: color-mix(in oklab, var(--color-clinico-secundario) 30%, white);
+  color: var(--color-clinico-texto);
+}
+
+@layer components {
+  .btn-primary {
+    @apply rounded-xl bg-clinico-secundario text-white font-medium px-5 py-2.5 shadow-sm
+      transition-all duration-150 hover:shadow-md hover:brightness-110 active:brightness-95
+      disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:brightness-100;
+  }
+
+  .btn-secondary {
+    @apply rounded-xl border border-clinico-borde bg-white text-clinico-texto font-medium px-5 py-2.5
+      transition-all duration-150 hover:bg-clinico-fondo hover:border-clinico-secundario/40
+      disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply rounded-lg text-red-600 font-medium text-sm transition-colors duration-150 hover:text-red-700 hover:underline;
+  }
+
+  .field {
+    @apply rounded-lg border border-clinico-borde px-3 py-2 text-clinico-texto bg-white
+      transition-colors duration-150 outline-none
+      focus:border-clinico-secundario focus:ring-2 focus:ring-clinico-secundario/25;
+  }
+
+  .field-label {
+    @apply flex flex-col gap-1 text-sm text-clinico-texto/80;
+  }
+
+  .card {
+    @apply bg-white border border-clinico-borde rounded-2xl shadow-sm;
+  }
+}

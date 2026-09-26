@@ -1,0 +1,200 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header title="Grabación" [backLink]="'/pacientes/' + pacienteId">
+    <div actions>
+      <button
+        type="button"
+        (click)="abrirModalNuevaGrabacion()"
+        class="inline-flex items-center gap-1.5 rounded-full bg-clinico-fondo
+          pl-2.5 pr-3.5 py-1.5 text-sm font-medium text-clinico-secundario-oscuro
+          transition-colors duration-150 hover:bg-white"
+      >
+        <app-icon name="mic" class="w-4 h-4" />
+        Nueva grabación
+      </button>
+    </div>
+  </app-page-header>
+
+  <main class="mx-auto max-w-3xl px-8 py-10">
+    @if (error()) {
+      <p class="text-sm text-red-600 mb-4">{{ error() }}</p>
+    }
+
+    @if (cargando()) {
+      <p class="text-sm text-clinico-texto/60">Cargando...</p>
+    } @else if (grabaciones().length === 0) {
+      <p class="text-sm text-clinico-texto/60">Aún no hay grabaciones registradas.</p>
+    }
+
+    <div class="space-y-3">
+      @for (grabacion of grabaciones(); track grabacion.id) {
+        <div class="card p-5">
+          <div class="flex items-start justify-between gap-2 mb-3">
+            <div class="min-w-0">
+              <p class="font-medium text-clinico-texto truncate">{{ grabacion.nombre }}</p>
+              <p class="text-xs text-clinico-texto/50 mt-0.5">
+                {{ grabacion.creado_en.slice(0, 10) }} · {{ formatearTamano(grabacion.tamano_bytes) }}
+              </p>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                (click)="abrirModalRenombrar(grabacion)"
+                class="text-clinico-texto/40 hover:text-clinico-secundario p-1"
+                title="Renombrar grabación"
+              >
+                <app-icon name="edit" class="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                (click)="abrirModalEliminar(grabacion.id)"
+                class="text-clinico-texto/40 hover:text-red-600 p-1"
+                title="Eliminar grabación"
+              >
+                <app-icon name="trash" class="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          <audio
+            [src]="grabacion.src"
+            (loadedmetadata)="corregirDuracion($event)"
+            controls
+            preload="metadata"
+            class="w-full h-10"
+          ></audio>
+        </div>
+      }
+    </div>
+  </main>
+
+  @if (modalNuevaGrabacionAbierto()) {
+    <div class="fixed inset-0 bg-black/30 flex items-center justify-center px-4 animate-fade-in">
+      <div class="card p-6 w-full max-w-md animate-scale-in">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-clinico-texto">Nueva grabación</h3>
+          <button type="button" (click)="cerrarModalNuevaGrabacion()" class="text-clinico-texto/40 hover:text-clinico-texto">
+            <app-icon name="close" class="w-5 h-5" />
+          </button>
+        </div>
+
+        <label class="field-label">
+          Nombre
+          <input
+            type="text"
+            [ngModel]="nuevoNombre()"
+            (ngModelChange)="nuevoNombre.set($event)"
+            [disabled]="grabando()"
+            placeholder="Ej: Sesión 12 - seguimiento"
+            class="field"
+          />
+        </label>
+
+        @if (grabando()) {
+          <div class="flex items-center gap-2 mt-4 text-red-600">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse"></span>
+            <span class="font-medium">Grabando... {{ formatearDuracion(segundosTranscurridos()) }}</span>
+          </div>
+        }
+
+        @if (errorGrabacion()) {
+          <p class="text-sm text-red-600 mt-3">{{ errorGrabacion() }}</p>
+        }
+
+        <div class="flex gap-3 justify-end pt-4">
+          <button type="button" (click)="cerrarModalNuevaGrabacion()" class="btn-secondary">Cancelar</button>
+          @if (!grabando()) {
+            <button
+              type="button"
+              (click)="iniciarGrabacion()"
+              [disabled]="!nuevoNombre().trim()"
+              class="btn-primary"
+            >
+              Iniciar grabación
+            </button>
+          } @else {
+            <button
+              type="button"
+              (click)="detenerYGuardarGrabacion()"
+              [disabled]="guardandoGrabacion()"
+              class="btn-danger"
+            >
+              {{ guardandoGrabacion() ? "Guardando..." : "Detener y guardar" }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (modalRenombrarAbierto()) {
+    <div class="fixed inset-0 bg-black/30 flex items-center justify-center px-4 animate-fade-in">
+      <div class="card p-6 w-full max-w-md animate-scale-in">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-clinico-texto">Renombrar grabación</h3>
+          <button type="button" (click)="cerrarModalRenombrar()" class="text-clinico-texto/40 hover:text-clinico-texto">
+            <app-icon name="close" class="w-5 h-5" />
+          </button>
+        </div>
+
+        <label class="field-label">
+          Nombre
+          <input
+            type="text"
+            [ngModel]="nombreRenombrar()"
+            (ngModelChange)="nombreRenombrar.set($event)"
+            class="field"
+          />
+        </label>
+
+        @if (errorRenombrar()) {
+          <p class="text-sm text-red-600 mt-3">{{ errorRenombrar() }}</p>
+        }
+
+        <div class="flex gap-3 justify-end pt-4">
+          <button type="button" (click)="cerrarModalRenombrar()" class="btn-secondary">Cancelar</button>
+          <button
+            type="button"
+            (click)="confirmarRenombrar()"
+            [disabled]="!nombreRenombrar().trim() || renombrando()"
+            class="btn-primary"
+          >
+            {{ renombrando() ? "Guardando..." : "Guardar" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (modalEliminarAbierto()) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center px-4 animate-fade-in">
+      <div class="card p-6 w-full max-w-md animate-scale-in border-t-4 border-t-red-500">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <app-icon name="alert-triangle" class="w-5 h-5" />
+          </span>
+          <div>
+            <h3 class="font-semibold text-clinico-texto">Eliminar grabación</h3>
+            <p class="text-sm text-clinico-texto/60 mt-1">
+              Esta acción es irreversible. Se eliminará permanentemente el archivo de audio.
+            </p>
+          </div>
+        </div>
+
+        @if (errorEliminar()) {
+          <p class="text-sm text-red-600 mb-3">{{ errorEliminar() }}</p>
+        }
+
+        <div class="flex gap-3 justify-end pt-2">
+          <button type="button" (click)="cerrarModalEliminar()" class="btn-secondary">Cancelar</button>
+          <button
+            type="button"
+            (click)="confirmarEliminar()"
+            [disabled]="eliminando()"
+            class="btn-danger"
+          >
+            {{ eliminando() ? "Eliminando..." : "Sí, eliminar" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

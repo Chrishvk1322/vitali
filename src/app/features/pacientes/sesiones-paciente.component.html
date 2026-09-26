@@ -1,0 +1,208 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header title="Sesiones" [backLink]="'/pacientes/' + pacienteId">
+    <div actions>
+      <button
+        type="button"
+        (click)="abrirModalSesion()"
+        class="inline-flex items-center gap-1.5 rounded-full bg-clinico-fondo
+          pl-2.5 pr-3.5 py-1.5 text-sm font-medium text-clinico-secundario-oscuro
+          transition-colors duration-150 hover:bg-white"
+      >
+        <app-icon name="plus" class="w-4 h-4" />
+        Registrar sesión
+      </button>
+    </div>
+  </app-page-header>
+
+  <main class="mx-auto max-w-3xl px-8 py-10">
+    @if (error()) {
+      <p class="text-sm text-red-600 mb-4">{{ error() }}</p>
+    }
+
+    @if (cargando()) {
+      <p class="text-sm text-clinico-texto/60">Cargando...</p>
+    } @else if (sesiones().length === 0) {
+      <p class="text-sm text-clinico-texto/60">Aún no hay sesiones registradas.</p>
+    }
+
+    <div class="space-y-3">
+      @for (sesion of sesiones(); track sesion.id) {
+        <div class="card p-5">
+          <div class="flex justify-between items-start gap-2">
+            <p class="text-sm font-medium text-clinico-texto">{{ sesion.fecha_hora.slice(0, 10) }}</p>
+            <div class="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                (click)="abrirModalSesion(sesion)"
+                class="text-clinico-texto/40 hover:text-clinico-secundario p-1"
+                title="Editar sesión"
+              >
+                <app-icon name="edit" class="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                (click)="abrirModalEliminarSesion(sesion.id)"
+                class="text-clinico-texto/40 hover:text-red-600 p-1"
+                title="Eliminar sesión"
+              >
+                <app-icon name="trash" class="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          @if (sesion.resumen_tratado) {
+            <p class="text-sm text-clinico-texto mt-1"><span class="text-clinico-texto/50">Resumen:</span> {{ sesion.resumen_tratado }}</p>
+          }
+          @if (sesion.observaciones) {
+            <p class="text-sm text-clinico-texto mt-1"><span class="text-clinico-texto/50">Observaciones:</span> {{ sesion.observaciones }}</p>
+          }
+          @if (tareasComoLista(sesion.tareas).length > 0) {
+            <div class="mt-2">
+              <span class="text-sm text-clinico-texto/50">Tareas:</span>
+              <ul class="list-disc list-inside text-sm text-clinico-texto mt-0.5 space-y-0.5">
+                @for (tarea of tareasComoLista(sesion.tareas); track tarea) {
+                  <li>{{ tarea }}</li>
+                }
+              </ul>
+            </div>
+          }
+
+          <div class="mt-3 pt-3 border-t border-clinico-borde/60">
+            @if (adjuntosDe(sesion.id).length > 0) {
+              <div class="flex flex-wrap gap-2 mb-2">
+                @for (adjunto of adjuntosDe(sesion.id); track adjunto.id) {
+                  <div
+                    class="inline-flex items-center gap-1.5 rounded-full border border-clinico-borde bg-clinico-fondo
+                      pl-2.5 pr-1.5 py-1 text-xs text-clinico-texto"
+                  >
+                    <button
+                      type="button"
+                      (click)="abrirAdjunto(adjunto)"
+                      class="inline-flex items-center gap-1 hover:text-clinico-secundario"
+                      [title]="'Abrir ' + adjunto.nombre_original"
+                    >
+                      <app-icon name="paperclip" class="w-3.5 h-3.5" />
+                      <span class="max-w-[160px] truncate">{{ adjunto.nombre_original }}</span>
+                      <span class="text-clinico-texto/40">({{ formatearTamano(adjunto.tamano_bytes) }})</span>
+                    </button>
+                    <button
+                      type="button"
+                      (click)="eliminarAdjunto(adjunto.id, sesion.id)"
+                      class="text-clinico-texto/30 hover:text-red-600 p-0.5"
+                      title="Eliminar adjunto"
+                    >
+                      <app-icon name="close" class="w-3 h-3" />
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+            <button
+              type="button"
+              (click)="adjuntarArchivo(sesion.id)"
+              [disabled]="subiendoAdjuntoSesionId() === sesion.id"
+              class="inline-flex items-center gap-1.5 text-xs font-medium text-clinico-secundario hover:underline disabled:opacity-50"
+            >
+              <app-icon name="paperclip" class="w-3.5 h-3.5" />
+              {{ subiendoAdjuntoSesionId() === sesion.id ? "Subiendo..." : "Adjuntar archivo" }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (errorAdjunto()) {
+      <p class="text-sm text-red-600 mt-4">{{ errorAdjunto() }}</p>
+    }
+  </main>
+
+  @if (modalSesionAbierto()) {
+    <div class="fixed inset-0 bg-black/30 flex items-center justify-center px-4 animate-fade-in">
+      <div class="card p-6 w-full max-w-md animate-scale-in">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-clinico-texto">{{ sesionEditId() ? "Editar Sesión" : "Registrar Sesión" }}</h3>
+          <button type="button" (click)="cerrarModalSesion()" class="text-clinico-texto/40 hover:text-clinico-texto">
+            <app-icon name="close" class="w-5 h-5" />
+          </button>
+        </div>
+        <form [formGroup]="formSesion" (ngSubmit)="guardarSesion()" class="space-y-4">
+          <label class="field-label">
+            Fecha
+            <input type="date" formControlName="fecha" class="field" />
+          </label>
+          <label class="field-label">
+            Resumen de lo tratado
+            <textarea formControlName="resumen_tratado" rows="3" class="field"></textarea>
+          </label>
+          <label class="field-label">
+            Observaciones / acuerdos
+            <textarea formControlName="observaciones" rows="3" class="field"></textarea>
+          </label>
+          <label class="field-label">
+            Tareas (una por línea)
+            <textarea formControlName="tareas" rows="3" placeholder="Ej: practicar respiración diafragmática" class="field"></textarea>
+          </label>
+          <div class="flex gap-3 justify-end pt-2">
+            <button type="button" (click)="cerrarModalSesion()" class="btn-secondary">Cancelar</button>
+            <button type="submit" [disabled]="formSesion.invalid || guardandoSesion()" class="btn-primary">
+              {{ guardandoSesion() ? "Guardando..." : "Guardar" }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (modalEliminarSesionAbierto()) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center px-4 animate-fade-in">
+      <div class="card p-6 w-full max-w-md animate-scale-in border-t-4 border-t-red-500">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <app-icon name="alert-triangle" class="w-5 h-5" />
+          </span>
+          <div>
+            <h3 class="font-semibold text-clinico-texto">Eliminar sesión</h3>
+            <p class="text-sm text-clinico-texto/60 mt-1">
+              Esta acción es irreversible. Se eliminará permanentemente el registro de esta sesión.
+            </p>
+          </div>
+        </div>
+
+        @if (errorEliminarSesion()) {
+          <p class="text-sm text-red-600 mb-3">{{ errorEliminarSesion() }}</p>
+        }
+
+        <div class="flex gap-3 justify-end pt-2">
+          <button type="button" (click)="cerrarModalEliminarSesion()" class="btn-secondary">Cancelar</button>
+          <button
+            type="button"
+            (click)="confirmarEliminarSesion()"
+            [disabled]="eliminandoSesion()"
+            class="btn-danger"
+          >
+            {{ eliminandoSesion() ? "Eliminando..." : "Sí, eliminar" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (adjuntoVista(); as vista) {
+    <div class="fixed inset-0 bg-black/60 flex items-center justify-center px-4 py-8 animate-fade-in">
+      <div class="card p-4 w-full max-w-3xl h-full max-h-[90vh] flex flex-col animate-scale-in">
+        <div class="flex items-center justify-between mb-3 shrink-0">
+          <p class="font-medium text-clinico-texto truncate pr-4">{{ vista.nombre }}</p>
+          <button type="button" (click)="cerrarAdjuntoVista()" class="text-clinico-texto/40 hover:text-clinico-texto shrink-0">
+            <app-icon name="close" class="w-5 h-5" />
+          </button>
+        </div>
+        <div class="flex-1 min-h-0 overflow-auto flex items-center justify-center bg-clinico-fondo rounded-lg">
+          @if (vista.tipo === "imagen") {
+            <img [src]="vista.url" [alt]="vista.nombre" class="max-w-full max-h-full object-contain" />
+          } @else {
+            <iframe [src]="vista.urlSegura" class="w-full h-full rounded-lg border-0" title="Vista previa del PDF"></iframe>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

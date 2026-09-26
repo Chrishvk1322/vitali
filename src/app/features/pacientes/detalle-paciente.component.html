@@ -1,0 +1,182 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header title="Detalle del Paciente" backLink="/pacientes/listado">
+    @if (paciente(); as p) {
+      <div actions class="flex items-center gap-2">
+        <a
+          [routerLink]="['/pacientes', p.id, 'editar']"
+          class="inline-flex items-center gap-1.5 rounded-full bg-clinico-fondo
+            pl-2.5 pr-3.5 py-1.5 text-sm font-medium text-clinico-secundario-oscuro
+            transition-colors duration-150 hover:bg-white"
+        >
+          <app-icon name="edit" class="w-4 h-4" />
+          Editar
+        </a>
+        <button
+          type="button"
+          (click)="abrirModalEliminar()"
+          class="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50
+            pl-2.5 pr-3.5 py-1.5 text-sm font-medium text-red-600
+            transition-colors duration-150 hover:bg-red-100 hover:border-red-300"
+        >
+          <app-icon name="trash" class="w-4 h-4" />
+          Eliminar
+        </button>
+      </div>
+    }
+  </app-page-header>
+
+  <main class="mx-auto max-w-5xl px-8 py-10 space-y-6">
+    @if (error()) {
+      <p class="text-sm text-red-600">{{ error() }}</p>
+    }
+
+    @if (cargando()) {
+      <p class="text-sm text-clinico-texto/60">Cargando...</p>
+    }
+
+    @if (paciente(); as p) {
+      <section class="card border-l-4 border-l-clinico-secundario p-8">
+        <h2 class="font-display font-semibold text-clinico-texto text-2xl mb-6">{{ p.apellidos_nombres }}</h2>
+
+        <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4 text-sm">
+          <div><dt class="text-clinico-texto/50">Edad</dt><dd class="text-clinico-texto mt-0.5">{{ p.edad ?? "-" }}</dd></div>
+          <div><dt class="text-clinico-texto/50">Sexo</dt><dd class="text-clinico-texto mt-0.5">{{ p.sexo ?? "-" }}</dd></div>
+          <div><dt class="text-clinico-texto/50">Fecha de nacimiento</dt><dd class="text-clinico-texto mt-0.5">{{ p.fecha_nacimiento }}</dd></div>
+          <div><dt class="text-clinico-texto/50">Lugar de nacimiento</dt><dd class="text-clinico-texto mt-0.5">{{ p.lugar_nacimiento ?? "-" }}</dd></div>
+          <div><dt class="text-clinico-texto/50">Estado civil</dt><dd class="text-clinico-texto mt-0.5">{{ p.estado_civil ?? "-" }}</dd></div>
+          <div><dt class="text-clinico-texto/50">Grado de instrucción</dt><dd class="text-clinico-texto mt-0.5">{{ p.grado_instruccion ?? "-" }}</dd></div>
+          <div><dt class="text-clinico-texto/50">Ocupación</dt><dd class="text-clinico-texto mt-0.5">{{ p.ocupacion ?? "-" }}</dd></div>
+          <div class="sm:col-span-2 lg:col-span-3"><dt class="text-clinico-texto/50">Domicilio</dt><dd class="text-clinico-texto mt-0.5">{{ p.domicilio ?? "-" }}</dd></div>
+          <div><dt class="text-clinico-texto/50">Teléfono</dt><dd class="text-clinico-texto mt-0.5">{{ p.telefono ?? "-" }}</dd></div>
+          <div><dt class="text-clinico-texto/50">Email</dt><dd class="text-clinico-texto mt-0.5">{{ p.email ?? "-" }}</dd></div>
+          <div><dt class="text-clinico-texto/50">Vive con</dt><dd class="text-clinico-texto mt-0.5">{{ p.vive_con ?? "-" }}</dd></div>
+          <div><dt class="text-clinico-texto/50">Nº hijos</dt><dd class="text-clinico-texto mt-0.5">{{ p.num_hijos ?? "No tiene" }}</dd></div>
+          <div><dt class="text-clinico-texto/50">Nº hermanos</dt><dd class="text-clinico-texto mt-0.5">{{ p.num_hermanos ?? "No tiene" }}</dd></div>
+          <div class="sm:col-span-2 lg:col-span-3"><dt class="text-clinico-texto/50">Acompañante</dt><dd class="text-clinico-texto mt-0.5">{{ p.nombre_acompanante ?? "-" }}</dd></div>
+          <div><dt class="text-clinico-texto/50">Fecha de consulta</dt><dd class="text-clinico-texto mt-0.5">{{ p.fecha_consulta }}</dd></div>
+        </dl>
+      </section>
+
+      <a
+        [routerLink]="['/pacientes', p.id, 'analisis-funcional']"
+        class="group card flex items-center gap-4 p-6 border-l-4 border-l-clinico-secundario transition-all duration-150
+          hover:shadow-md hover:-translate-y-0.5 hover:border-clinico-secundario/60"
+      >
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-secundario text-white">
+          <app-icon name="tests" class="w-5 h-5" />
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="font-display font-semibold text-clinico-texto text-lg">Sesión de consulta</p>
+          <p class="text-sm text-clinico-texto/60 mt-0.5">Análisis funcional de los problemas identificados</p>
+        </div>
+        <app-icon name="arrow-left" class="w-4 h-4 text-clinico-texto/30 rotate-180 shrink-0" />
+      </a>
+
+      <section class="card flex items-center gap-4 p-6 border-l-4 border-l-clinico-primario">
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-primario/10 text-clinico-primario">
+          <app-icon name="tests" class="w-5 h-5" />
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="font-display font-semibold text-clinico-texto text-lg">Evaluación Psicométrica</p>
+          <p class="text-sm text-clinico-texto/60 mt-0.5">Próximamente.</p>
+        </div>
+      </section>
+
+      <a
+        [routerLink]="['/pacientes', p.id, 'sesiones']"
+        class="group card flex items-center gap-4 p-6 border-l-4 border-l-clinico-primario transition-all duration-150
+          hover:shadow-md hover:-translate-y-0.5 hover:border-clinico-primario/60"
+      >
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-primario/10 text-clinico-primario">
+          <app-icon name="edit" class="w-5 h-5" />
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="font-display font-semibold text-clinico-texto text-lg">Sesiones</p>
+          <p class="text-sm text-clinico-texto/60 mt-0.5">Registro de sesiones, tareas y archivos adjuntos</p>
+        </div>
+        <app-icon name="arrow-left" class="w-4 h-4 text-clinico-texto/30 rotate-180 shrink-0" />
+      </a>
+
+      <a
+        [routerLink]="['/pacientes', p.id, 'citas']"
+        class="group card flex items-center gap-4 p-6 border-l-4 border-l-clinico-secundario transition-all duration-150
+          hover:shadow-md hover:-translate-y-0.5 hover:border-clinico-secundario/60"
+      >
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-secundario text-white">
+          <app-icon name="calendar-days" class="w-5 h-5" />
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="font-display font-semibold text-clinico-texto text-lg">Citas</p>
+          <p class="text-sm text-clinico-texto/60 mt-0.5">Agendar, reprogramar y cancelar citas</p>
+        </div>
+        <app-icon name="arrow-left" class="w-4 h-4 text-clinico-texto/30 rotate-180 shrink-0" />
+      </a>
+
+      <a
+        [routerLink]="['/pacientes', p.id, 'evaluaciones']"
+        class="group card flex items-center gap-4 p-6 border-l-4 border-l-clinico-primario transition-all duration-150
+          hover:shadow-md hover:-translate-y-0.5 hover:border-clinico-primario/60"
+      >
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-primario/10 text-clinico-primario">
+          <app-icon name="tests" class="w-5 h-5" />
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="font-display font-semibold text-clinico-texto text-lg">Evaluaciones</p>
+          <p class="text-sm text-clinico-texto/60 mt-0.5">Tests aplicados y resultados registrados</p>
+        </div>
+        <app-icon name="arrow-left" class="w-4 h-4 text-clinico-texto/30 rotate-180 shrink-0" />
+      </a>
+
+      <a
+        [routerLink]="['/pacientes', p.id, 'grabaciones']"
+        class="group card flex items-center gap-4 p-6 border-l-4 border-l-clinico-secundario transition-all duration-150
+          hover:shadow-md hover:-translate-y-0.5 hover:border-clinico-secundario/60"
+      >
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-secundario text-white">
+          <app-icon name="mic" class="w-5 h-5" />
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="font-display font-semibold text-clinico-texto text-lg">Grabación</p>
+          <p class="text-sm text-clinico-texto/60 mt-0.5">Grabaciones de audio de las sesiones</p>
+        </div>
+        <app-icon name="arrow-left" class="w-4 h-4 text-clinico-texto/30 rotate-180 shrink-0" />
+      </a>
+    }
+  </main>
+
+  @if (modalEliminarAbierto()) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center px-4 animate-fade-in">
+      <div class="card p-6 w-full max-w-md animate-scale-in border-t-4 border-t-red-500">
+        <div class="flex items-start gap-3 mb-4">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <app-icon name="alert-triangle" class="w-5 h-5" />
+          </span>
+          <div>
+            <h3 class="font-semibold text-clinico-texto">Eliminar paciente</h3>
+            <p class="text-sm text-clinico-texto/60 mt-1">
+              Esta acción es irreversible. Se eliminará permanentemente
+              <span class="font-semibold text-clinico-texto">{{ paciente()?.apellidos_nombres }}</span>
+              junto con todas sus sesiones, citas y evaluaciones registradas. Los datos no se podrán recuperar.
+            </p>
+          </div>
+        </div>
+
+        @if (errorEliminar()) {
+          <p class="text-sm text-red-600 mb-3">{{ errorEliminar() }}</p>
+        }
+
+        <div class="flex gap-3 justify-end pt-2">
+          <button type="button" (click)="cerrarModalEliminar()" class="btn-secondary">Cancelar</button>
+          <button
+            type="button"
+            (click)="confirmarEliminar()"
+            [disabled]="eliminando()"
+            class="btn-danger"
+          >
+            {{ eliminando() ? "Eliminando..." : "Sí, eliminar definitivamente" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

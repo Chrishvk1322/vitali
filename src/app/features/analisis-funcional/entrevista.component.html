@@ -1,0 +1,45 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header title="Entrevista" [backLink]="'/pacientes/' + pacienteId + '/analisis-funcional'" />
+
+  <main class="mx-auto w-[80%] px-8 py-10">
+    @if (cargando()) {
+      <p class="text-sm text-clinico-texto/60">Cargando...</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="space-y-6" [class.hidden]="cargando()">
+      <p class="text-sm text-clinico-texto/60">Pautas para la entrevista conductual.</p>
+
+      @for (seccion of secciones; track seccion.letra) {
+        <section class="card border-l-4 border-l-clinico-secundario p-6">
+          <h2 class="font-semibold text-clinico-texto mb-4">
+            {{ seccion.letra }}. {{ seccion.titulo }}
+          </h2>
+
+          <div class="space-y-5">
+            @for (pregunta of seccion.preguntas; track pregunta.codigo) {
+              <label class="field-label text-base">
+                <span class="font-medium text-clinico-texto/70">{{ pregunta.numero }}</span>
+                {{ pregunta.texto }}
+                <textarea [formControlName]="pregunta.codigo" rows="3" class="field w-full mt-1 text-base"></textarea>
+              </label>
+            }
+          </div>
+        </section>
+      }
+
+      @if (error()) {
+        <p class="text-sm text-red-600">{{ error() }}</p>
+      }
+
+      @if (guardado() && !error()) {
+        <p class="text-sm text-clinico-primario">Entrevista guardada correctamente.</p>
+      }
+
+      <div class="flex gap-3">
+        <button type="submit" [disabled]="guardando()" class="btn-primary">
+          {{ guardando() ? "Guardando..." : "Guardar Cambios" }}
+        </button>
+      </div>
+    </form>
+  </main>
+</div>

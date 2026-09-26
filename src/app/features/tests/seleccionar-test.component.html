@@ -1,0 +1,42 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <app-page-header title="Seleccionar Test" [backLink]="'/pacientes/' + pacienteId" />
+
+  <main class="mx-auto max-w-4xl px-8 py-10">
+    @if (error()) {
+      <p class="text-sm text-red-600 mb-4">{{ error() }}</p>
+    }
+
+    @if (!cargando() && tests().length === 0) {
+      <p class="text-sm text-clinico-texto/60">
+        Aún no hay tests disponibles. Puedes crear uno desde el módulo "Tests" del hub.
+      </p>
+    }
+
+    <div class="space-y-3">
+      @for (test of tests(); track test.id) {
+        <div class="card flex items-center gap-4 p-5">
+          <span
+            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-secundario
+              text-white"
+          >
+            <app-icon name="tests" class="w-5 h-5" />
+          </span>
+
+          <div class="min-w-0 flex-1">
+            <p class="font-display font-semibold text-clinico-texto text-lg truncate">{{ test.nombre }}</p>
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-0.5 text-sm text-clinico-texto/60 mt-0.5">
+              <span>{{ test.cantidad_preguntas }} {{ test.cantidad_preguntas === 1 ? "pregunta" : "preguntas" }}</span>
+              @if (test.descripcion) {
+                <span class="truncate">{{ test.descripcion }}</span>
+              }
+            </div>
+          </div>
+
+          <a [routerLink]="['/pacientes', pacienteId, 'evaluar', test.id]" class="btn-primary px-3 py-1.5 text-sm shrink-0">
+            Seleccionar
+          </a>
+        </div>
+      }
+    </div>
+  </main>
+</div>

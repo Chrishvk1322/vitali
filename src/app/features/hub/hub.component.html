@@ -1,0 +1,110 @@
+<div class="min-h-screen bg-clinico-fondo">
+  <header class="flex items-center justify-between bg-clinico-secundario shadow-sm px-8 py-5">
+    <div class="flex items-center gap-3">
+      <img src="assets/logo-vitali.jpg" alt="Vitali" class="h-11 w-11 rounded-full object-cover ring-2 ring-white/60" />
+      <div>
+        <p class="font-display font-semibold text-white text-lg leading-none">Vitali</p>
+        <p class="text-xs text-white tracking-wide mt-0.5">Centro Psicológico</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <div class="text-right">
+        <p class="text-xs text-white">Bienvenida/o</p>
+        <p class="font-medium text-white text-sm">{{ auth.usuario()?.nombres }}</p>
+      </div>
+      <button type="button" (click)="cerrarSesion()" class="btn-secondary inline-flex items-center gap-1.5 text-sm px-3.5 py-2">
+        <app-icon name="logout" class="w-4 h-4" />
+        Salir
+      </button>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-8 py-14">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <a
+        routerLink="/pacientes/nuevo"
+        class="group card p-8 flex flex-col items-start gap-4 transition-all duration-150
+          hover:shadow-lg hover:-translate-y-0.5 hover:border-clinico-secundario/40"
+      >
+        <span class="flex h-12 w-12 items-center justify-center rounded-full bg-clinico-secundario text-white">
+          <app-icon name="plus" class="w-6 h-6" />
+        </span>
+        <div>
+          <h2 class="font-semibold text-clinico-texto">Nuevo Paciente</h2>
+          <p class="text-sm text-clinico-texto/60 mt-1">Registrar una nueva historia clínica</p>
+        </div>
+      </a>
+
+      <a
+        routerLink="/pacientes/listado"
+        class="group card p-8 flex flex-col items-start gap-4 transition-all duration-150
+          hover:shadow-lg hover:-translate-y-0.5 hover:border-clinico-secundario/40"
+      >
+        <span class="flex h-12 w-12 items-center justify-center rounded-full bg-clinico-secundario text-white">
+          <app-icon name="pacientes" class="w-6 h-6" />
+        </span>
+        <div>
+          <h2 class="font-semibold text-clinico-texto">Listado de Pacientes</h2>
+          <p class="text-sm text-clinico-texto/60 mt-1">Buscar e ingresar a historias clínicas</p>
+        </div>
+      </a>
+
+      <a
+        routerLink="/agenda"
+        class="group card p-8 flex flex-col items-start gap-4 transition-all duration-150
+          hover:shadow-lg hover:-translate-y-0.5 hover:border-clinico-secundario/40"
+      >
+        <span class="flex h-12 w-12 items-center justify-center rounded-full bg-clinico-secundario text-white">
+          <app-icon name="agenda" class="w-6 h-6" />
+        </span>
+        <div>
+          <h2 class="font-semibold text-clinico-texto">Agenda</h2>
+          <p class="text-sm text-clinico-texto/60 mt-1">Calendario de citas</p>
+        </div>
+      </a>
+
+      <a
+        routerLink="/tests"
+        class="group card p-8 flex flex-col items-start gap-4 transition-all duration-150
+          hover:shadow-lg hover:-translate-y-0.5 hover:border-clinico-primario/40"
+      >
+        <span class="flex h-12 w-12 items-center justify-center rounded-full bg-clinico-primario/15 text-clinico-primario">
+          <app-icon name="tests" class="w-6 h-6" />
+        </span>
+        <div>
+          <h2 class="font-semibold text-clinico-texto">Tests</h2>
+          <p class="text-sm text-clinico-texto/60 mt-1">Evaluaciones psicométricas</p>
+        </div>
+      </a>
+
+      <a
+        routerLink="/recursos"
+        class="group card p-8 flex flex-col items-start gap-4 transition-all duration-150
+          hover:shadow-lg hover:-translate-y-0.5 hover:border-clinico-secundario/40"
+      >
+        <span class="flex h-12 w-12 items-center justify-center rounded-full bg-clinico-secundario text-white">
+          <app-icon name="paperclip" class="w-6 h-6" />
+        </span>
+        <div>
+          <h2 class="font-semibold text-clinico-texto">Recursos</h2>
+          <p class="text-sm text-clinico-texto/60 mt-1">Archivos PDF de apoyo</p>
+        </div>
+      </a>
+
+      <a
+        routerLink="/plantillas"
+        class="group card p-8 flex flex-col items-start gap-4 transition-all duration-150
+          hover:shadow-lg hover:-translate-y-0.5 hover:border-clinico-primario/40"
+      >
+        <span class="flex h-12 w-12 items-center justify-center rounded-full bg-clinico-primario/15 text-clinico-primario">
+          <app-icon name="plantillas" class="w-6 h-6" />
+        </span>
+        <div>
+          <h2 class="font-semibold text-clinico-texto">Plantillas</h2>
+          <p class="text-sm text-clinico-texto/60 mt-1">Generación de reportes</p>
+        </div>
+      </a>
+    </div>
+  </main>
+</div>
