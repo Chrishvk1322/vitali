@@ -30,8 +30,41 @@ export class ListadoProblemasComponent {
   readonly eliminando = signal(false);
   readonly errorEliminar = signal<string | null>(null);
 
+  readonly nota = signal("");
+  readonly guardandoNota = signal(false);
+  readonly notaGuardada = signal(false);
+  readonly errorNota = signal<string | null>(null);
+
   constructor() {
     this.cargarProblemas();
+    this.cargarNota();
+  }
+
+  private async cargarNota(): Promise<void> {
+    try {
+      this.nota.set((await this.analisisFuncionalService.obtenerNotaSesionConsulta(this.pacienteId)) ?? "");
+    } catch (err) {
+      this.errorNota.set(typeof err === "string" ? err : "no se pudo cargar la nota");
+    }
+  }
+
+  onNotaChange(valor: string): void {
+    this.nota.set(valor);
+    this.notaGuardada.set(false);
+  }
+
+  async guardarNota(): Promise<void> {
+    if (this.guardandoNota()) return;
+    this.guardandoNota.set(true);
+    this.errorNota.set(null);
+    try {
+      await this.analisisFuncionalService.guardarNotaSesionConsulta(this.pacienteId, this.nota().trim() || null);
+      this.notaGuardada.set(true);
+    } catch (err) {
+      this.errorNota.set(typeof err === "string" ? err : "no se pudo guardar la nota");
+    } finally {
+      this.guardandoNota.set(false);
+    }
   }
 
   private async cargarProblemas(): Promise<void> {

@@ -151,6 +151,12 @@ fn run_migrations(conn: &Connection) -> rusqlite::Result<()> {
             UNIQUE(paciente_id, pregunta_codigo)
         );
 
+        CREATE TABLE IF NOT EXISTS sesion_consulta_notas (
+            paciente_id INTEGER PRIMARY KEY REFERENCES pacientes(id),
+            nota TEXT,
+            actualizado_en TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+
         CREATE TABLE IF NOT EXISTS propuestas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             paciente_id INTEGER NOT NULL UNIQUE REFERENCES pacientes(id),

@@ -1,5 +1,5 @@
 use crate::auth::DbState;
-use rusqlite::params;
+use rusqlite::{params, OptionalExtension};
 use serde::{Deserialize, Serialize};
 use tauri::State;
 
@@ -193,6 +193,41 @@ pub fn eliminar_problema(state: State<DbState>, id: i64) -> Result<(), String> {
     if filas == 0 {
         return Err("problema no encontrado".to_string());
     }
+
+    Ok(())
+}
+
+#[tauri::command]
+pub fn obtener_nota_sesion_consulta(
+    state: State<DbState>,
+    paciente_id: i64,
+) -> Result<Option<String>, String> {
+    let conn = state.0.lock().map_err(|_| "error interno de base de datos".to_string())?;
+
+    conn.query_row(
+        "SELECT nota FROM sesion_consulta_notas WHERE paciente_id = ?1",
+        params![paciente_id],
+        |row| row.get(0),
+    )
+    .optional()
+    .map_err(|e| format!("error consultando la nota: {e}"))
+    .map(|opcion| opcion.flatten())
+}
+
+#[tauri::command]
+pub fn guardar_nota_sesion_consulta(
+    state: State<DbState>,
+    paciente_id: i64,
+    nota: Option<String>,
+) -> Result<(), String> {
+    let conn = state.0.lock().map_err(|_| "error interno de base de datos".to_string())?;
+
+    conn.execute(
+        "INSERT INTO sesion_consulta_notas (paciente_id, nota) VALUES (?1, ?2)
+         ON CONFLICT(paciente_id) DO UPDATE SET nota = excluded.nota, actualizado_en = datetime('now')",
+        params![paciente_id, nota],
+    )
+    .map_err(|e| format!("no se pudo guardar la nota: {e}"))?;
 
     Ok(())
 }

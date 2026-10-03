@@ -72,12 +72,27 @@
         <app-icon name="arrow-left" class="w-4 h-4 text-clinico-texto/30 rotate-180 shrink-0" />
       </a>
 
+      <a
+        [routerLink]="['/pacientes', p.id, 'propuesta']"
+        class="group card flex items-center gap-4 p-6 border-l-4 border-l-clinico-primario transition-all duration-150
+          hover:shadow-md hover:-translate-y-0.5 hover:border-clinico-primario/60"
+      >
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-primario/10 text-clinico-primario">
+          <app-icon name="plantillas" class="w-5 h-5" />
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="font-display font-semibold text-clinico-texto text-lg">Plan de intervención terapéutica</p>
+          <p class="text-sm text-clinico-texto/60 mt-0.5">Objetivos, modalidad y plan de trabajo terapéutico</p>
+        </div>
+        <app-icon name="arrow-left" class="w-4 h-4 text-clinico-texto/30 rotate-180 shrink-0" />
+      </a>
+
       <section class="card flex items-center gap-4 p-6 border-l-4 border-l-clinico-primario">
         <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-primario/10 text-clinico-primario">
           <app-icon name="tests" class="w-5 h-5" />
         </span>
         <div class="min-w-0 flex-1">
-          <p class="font-display font-semibold text-clinico-texto text-lg">Evaluación Psicométrica</p>
+          <p class="font-display font-semibold text-clinico-texto text-lg">Evaluación Psicométrica - Informe psicológico</p>
           <p class="text-sm text-clinico-texto/60 mt-0.5">Próximamente.</p>
         </div>
       </section>

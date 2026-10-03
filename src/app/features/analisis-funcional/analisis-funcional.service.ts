@@ -54,4 +54,12 @@ export class AnalisisFuncionalService {
   eliminarProblema(id: number): Promise<void> {
     return invoke<void>("eliminar_problema", { id });
   }
+
+  obtenerNotaSesionConsulta(pacienteId: number): Promise<string | null> {
+    return invoke<string | null>("obtener_nota_sesion_consulta", { pacienteId });
+  }
+
+  guardarNotaSesionConsulta(pacienteId: number, nota: string | null): Promise<void> {
+    return invoke<void>("guardar_nota_sesion_consulta", { pacienteId, nota });
+  }
 }

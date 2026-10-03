@@ -1,6 +1,15 @@
 # Bitácora de Implementación — Sistema de Gestión de Historias Clínicas
 
-> Lee este archivo junto con `estructura.md` (spec original) al retomar el trabajo en una nueva sesión. Refleja el estado real del código, no solo la intención.
+> Este archivo es la única fuente de verdad del proyecto: refleja el estado real del código, no solo la intención. Antes vivía junto a `estructura.md` (la especificación original); se unificaron en este documento el 2026-10-03 porque `estructura.md` había quedado desactualizado (su modelo de datos y su Fase 5 ya no coincidían con lo implementado) y duplicaba el stack, la paleta y el plan de fases que ya se documentan aquí.
+
+## Encargo original (resumen)
+
+Sistema de Gestión de Historias Clínicas para un consultorio psicológico, encargado como una especificación de 5 fases con este stack y paleta — ambos se mantuvieron sin cambios a lo largo del proyecto (ver "Decisiones técnicas confirmadas" debajo):
+
+- **Stack:** Tauri v2 (núcleo Rust) + Angular 21 (Signals, control flow nuevo, Reactive Forms) + Tailwind CSS v4 + SQLite embebido vía un único archivo `.db` local.
+- **Paleta original:** `#A2C09A` (verde salvia, primario/calma), `#6174B6` (azul pizarra/índigo, secundario/acción), `#F8FAF9` (fondo), `#2C3437` (texto), `#E2E8F0` (bordes). Son los valores base de los tokens `--color-clinico-*` en `src/styles.css`.
+- **Plan original de 5 fases:** (1) configuración + autenticación, (2) módulo de pacientes, (3) detalle del paciente y sesiones, (4) calendario/agenda, (5) placeholders de navegación para Tests y Plantillas. Las cinco se completaron y están detalladas fase por fase en el checklist de abajo; todo lo construido después (análisis funcional, entrevista, propuesta, recursos, Google Calendar, grabaciones, etc.) fue a pedido explícito del usuario, fuera del spec original.
+- El modelo de datos y el mapa de navegación originales quedaron ampliamente superados por la implementación real; para el esquema y las pantallas actuales, ver el código y las secciones fechadas de este documento en vez de un documento de spec separado.
 
 ## Decisiones técnicas confirmadas
 

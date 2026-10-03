@@ -58,6 +58,8 @@ pub fn run() {
             problemas::obtener_problema,
             problemas::actualizar_problema,
             problemas::eliminar_problema,
+            problemas::obtener_nota_sesion_consulta,
+            problemas::guardar_nota_sesion_consulta,
             entrevistas::obtener_entrevista,
             entrevistas::guardar_entrevista,
             propuestas::obtener_propuesta,

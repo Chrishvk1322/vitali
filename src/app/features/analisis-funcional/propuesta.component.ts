@@ -160,7 +160,7 @@ export class PropuestaComponent {
           })),
         })),
       });
-      await this.router.navigate(["/pacientes", this.pacienteId, "analisis-funcional"]);
+      await this.router.navigate(["/pacientes", this.pacienteId]);
     } catch (err) {
       this.error.set(typeof err === "string" ? err : "no se pudo guardar la propuesta");
     } finally {

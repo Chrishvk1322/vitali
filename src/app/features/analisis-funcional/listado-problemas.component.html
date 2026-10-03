@@ -76,20 +76,29 @@
       <app-icon name="arrow-left" class="w-4 h-4 text-clinico-texto/30 rotate-180 shrink-0" />
     </a>
 
-    <a
-      [routerLink]="['/pacientes', pacienteId, 'propuesta']"
-      class="group card flex items-center gap-4 p-6 border-l-4 border-l-clinico-primario transition-all duration-150
-        hover:shadow-md hover:-translate-y-0.5 hover:border-clinico-primario/60"
-    >
-      <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-clinico-primario/10 text-clinico-primario">
-        <app-icon name="plantillas" class="w-5 h-5" />
-      </span>
-      <div class="min-w-0 flex-1">
-        <p class="font-display font-semibold text-clinico-texto text-lg">Propuesta de intervención terapéutica</p>
-        <p class="text-sm text-clinico-texto/60 mt-0.5">Objetivos, modalidad y plan de trabajo terapéutico</p>
+    <section class="card border-l-4 border-l-clinico-primario p-8">
+      <h2 class="font-semibold text-clinico-texto text-lg mb-4">Nota</h2>
+      <textarea
+        [ngModel]="nota()"
+        (ngModelChange)="onNotaChange($event)"
+        rows="5"
+        placeholder="Escribe aquí alguna observación general de la sesión de consulta..."
+        class="field w-full"
+      ></textarea>
+
+      @if (errorNota()) {
+        <p class="text-sm text-red-600 mt-2">{{ errorNota() }}</p>
+      }
+
+      <div class="flex items-center gap-3 mt-3">
+        <button type="button" (click)="guardarNota()" [disabled]="guardandoNota()" class="btn-secondary px-3 py-1.5 text-sm">
+          {{ guardandoNota() ? "Guardando..." : "Guardar nota" }}
+        </button>
+        @if (notaGuardada() && !guardandoNota()) {
+          <span class="text-sm text-clinico-primario">Guardada</span>
+        }
       </div>
-      <app-icon name="arrow-left" class="w-4 h-4 text-clinico-texto/30 rotate-180 shrink-0" />
-    </a>
+    </section>
   </main>
 
   @if (modalNuevoProblemaAbierto()) {
